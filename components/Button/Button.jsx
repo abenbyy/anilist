@@ -6,5 +6,5 @@ export const Button = styled.button({
   color: `${TEXT_ON_SECONDARY}`,
   padding: `8px 16px`,
   border: "none",
-  borderRadius: "2px",
+  borderRadius: "6px",
 });

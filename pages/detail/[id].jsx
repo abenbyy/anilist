@@ -9,15 +9,49 @@ import {
   NavItem,
   DotProgress,
   Button,
+  Badge,
+  Card,
 } from "components";
 import Link from "next/link";
-import { ANIME_DETAIL } from "lib/queries/ANIME_DETAIL";
+import { ANIME_DETAIL } from "lib/queries/";
 import {
+  PRIMARY,
   BACKGROUND,
+  SECONDARY,
+  SHADOW,
   TEXT_ON_PRIMARY,
   TEXT_ON_PRIMARY_ALT,
+  TEXT_ON_SECONDARY,
 } from "styles/global";
 import parse from "html-react-parser";
+import styled from "@emotion/styled";
+import { convertMonth } from "lib/utils";
+
+const StyledLabel = styled.div({
+  width: "fit-content",
+  backgroundColor: `${SECONDARY}`,
+  color: `${TEXT_ON_SECONDARY}`,
+  borderRadius: "10px",
+  padding: "4px 8px",
+  fontSize: "8pt",
+});
+
+const StyledStats = styled.div({
+  color: `${TEXT_ON_PRIMARY}`,
+  fontSize: "16pt",
+  marginTop: "5px",
+});
+
+const Label = styled.div({
+  color: `${TEXT_ON_PRIMARY}`,
+  fontWeight: "bold",
+  fontSize: "10pt",
+  marginTop: "10px",
+});
+const Stats = styled.div({
+  color: `${TEXT_ON_PRIMARY_ALT}`,
+  fontSize: "11pt",
+});
 
 export default function Detail() {
   const router = useRouter();
@@ -115,6 +149,7 @@ export default function Detail() {
                       width: "215px",
                       height: "305px",
                       marginTop: "-85px",
+                      boxShadow: `0 4px 8px 0 rgba(0,0,0,0.6)`,
                     })}
                     src={data.Media.coverImage.extraLarge}
                     alt=""
@@ -122,10 +157,59 @@ export default function Detail() {
                   <Button
                     className={css({
                       width: "100%",
+                      marginTop: "15px",
                     })}
                   >
                     Add to Collections
                   </Button>
+                  <div
+                    className={css({
+                      marginTop: "10px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                    })}
+                  >
+                    {data.Media.genres.map((gen, i) => (
+                      <Badge
+                        className={css({
+                          marginRight: "5px",
+                          marginBottom: "5px",
+                        })}
+                        key={i}
+                      >
+                        {gen}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div
+                    className={css({
+                      marginTop: "15px",
+                    })}
+                  >
+                    <Label>Japanese Title</Label>
+                    <Stats>{data.Media.title.native}</Stats>
+                    <Label>English Title</Label>
+                    <Stats>{data.Media.title.english}</Stats>
+                    <Label>Aired at</Label>
+                    <Stats>{`${convertMonth(data.Media.startDate.month)} ${
+                      data.Media.startDate.day
+                    }, ${data.Media.startDate.year} - ${convertMonth(
+                      data.Media.endDate.month
+                    )} ${data.Media.endDate.day}, ${
+                      data.Media.endDate.year
+                    }`}</Stats>
+                    <Label>Episodes</Label>
+                    <Stats>{`${data.Media.episodes} episode(s)`}</Stats>
+                    <Label>Duration</Label>
+                    <Stats>{`${data.Media.duration} min`}</Stats>
+                    <Label>Studios</Label>
+                    <Stats>
+                      {data.Media.studios.nodes.length <= 0 && <div>-</div>}
+                      {data.Media.studios.nodes.map((st, i) => (
+                        <div key={i}>{st.name}</div>
+                      ))}
+                    </Stats>
+                  </div>
                 </div>
                 <div
                   className={css({
@@ -148,6 +232,131 @@ export default function Detail() {
                     })}
                   >
                     {parse(data.Media.description)}
+                  </div>
+                  <div
+                    className={css({
+                      marginTop: "10px",
+                      width: "100%",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                      gap: "1rem",
+                      padding: "10px 10px",
+                      backgroundColor: `${PRIMARY}`,
+                      borderRadius: "8px",
+                    })}
+                  >
+                    <div>
+                      <StyledLabel>Popularity</StyledLabel>
+                      <StyledStats>#{data.Media.popularity}</StyledStats>
+                    </div>
+                    <div>
+                      <StyledLabel>Rating</StyledLabel>
+                      <StyledStats>
+                        {data.Media.averageScore}{" "}
+                        <span
+                          className={css({
+                            fontSize: "10pt",
+                          })}
+                        >
+                          {" "}
+                          / 100
+                        </span>
+                      </StyledStats>
+                    </div>
+                    <div>
+                      <StyledLabel>Season</StyledLabel>
+                      <StyledStats>
+                        {data.Media.season} {data.Media.seasonYear}
+                      </StyledStats>
+                    </div>
+                    <div>
+                      <StyledLabel>Status</StyledLabel>
+                      <StyledStats>{data.Media.status}</StyledStats>
+                    </div>
+                  </div>
+                  <div
+                    className={css({
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                      gap: "1rem",
+                      marginTop: "20px",
+                    })}
+                  >
+                    {data.Media.characters.edges?.map((char, i) => (
+                      <Card
+                        style={{
+                          backgroundColor: PRIMARY,
+                          borderRadius: "4px",
+                          width: "100%",
+                          height: "fit-content",
+                          boxShadow: `0 4px 8px 0 ${SHADOW}`,
+                          cursor: "pointer",
+                        }}
+                        key={i}
+                      >
+                        <div
+                          className={css({
+                            padding: "4px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            fontSize: "10pt",
+                          })}
+                        >
+                          <div
+                            className={css({
+                              display: "flex",
+                              width: "100%",
+                              color: `${SECONDARY}`,
+
+                              alignItems: "center",
+                            })}
+                          >
+                            <img
+                              className={css({
+                                width: "80px",
+                                height: "120px",
+                              })}
+                              src={char.node.image.medium}
+                              alt=""
+                            />
+                            <div
+                              className={css({
+                                height: "100%",
+                                marginLeft: "10px",
+                              })}
+                            >
+                              {char.node.name.full}
+                            </div>
+                          </div>
+                          <div
+                            className={css({
+                              display: "flex",
+                              color: `${SECONDARY}`,
+                              alignItems: "center",
+                            })}
+                          >
+                            <div
+                              className={css({
+                                height: "100%",
+                                marginRight: "10px",
+                                textAlign: "right",
+                              })}
+                            >
+                              {char.voiceActors[0].name.full}
+                            </div>
+                            <img
+                              className={css({
+                                width: "80px",
+                                height: "120px",
+                              })}
+                              src={char.voiceActors[0].image.medium}
+                              alt=""
+                            />
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
                   </div>
                 </div>
               </div>

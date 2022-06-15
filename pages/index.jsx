@@ -167,22 +167,7 @@ export default function Home() {
                         }}
                       >
                         {anime.season} {anime.seasonYear} • {anime.episodes}{" "}
-                        episodes
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        {anime.genres.map((gen, i) => {
-                          if (i < 2)
-                            return (
-                              <Badge style={{ margin: "5px 3px 0 0" }} key={i}>
-                                {gen}
-                              </Badge>
-                            );
-                        })}
+                        episode(s)
                       </div>
                     </div>
                   </Card>
