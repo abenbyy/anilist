@@ -28,6 +28,7 @@ import {
 } from "components";
 import useStorage from "lib/hooks/useStorage";
 import { ALL_ANIME_PAGINATE } from "lib/queries";
+import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -140,6 +141,9 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>Abenbyy's Anilist | Home</title>
+      </Head>
       <Alert
         show={alertConfig.show}
         title={alertConfig.title}

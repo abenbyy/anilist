@@ -15,6 +15,7 @@ import {
 } from "components";
 
 import useStorage from "lib/hooks/useStorage";
+import Head from "next/head";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
@@ -89,6 +90,9 @@ export default function Collections() {
 
   return (
     <>
+      <Head>
+        <title>Abenbyy's Anilist | {name ?? name}</title>
+      </Head>
       <Modal show={showDialog} title="Delete Collection?">
         <div>
           Are you sure you want to delete this anime from the collection?

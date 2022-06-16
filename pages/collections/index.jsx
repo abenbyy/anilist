@@ -19,6 +19,7 @@ import {
 } from "components";
 
 import useStorage from "lib/hooks/useStorage";
+import Head from "next/head";
 import Link from "next/link";
 import { useState } from "react";
 import {
@@ -61,6 +62,9 @@ export default function Collections() {
 
   return (
     <>
+      <Head>
+        <title>Abenbyy's Anilist | Collections</title>
+      </Head>
       <Modal show={showDialog} title="Delete Collection?">
         <div>
           Are you sure you want to delete collection: {deleteCollection}?

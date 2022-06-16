@@ -36,6 +36,7 @@ import parse from "html-react-parser";
 import styled from "@emotion/styled";
 import { convertMonth } from "lib/utils";
 import useStorage from "lib/hooks/useStorage";
+import Head from "next/head";
 
 const StyledLabel = styled.div({
   width: "fit-content",
@@ -198,6 +199,9 @@ export default function Detail() {
 
   return (
     <>
+      <Head>
+        <title>Abenbyy's Anilist{data?.Media.title.romaji}</title>
+      </Head>
       <Alert
         show={alertConfig.show}
         title={alertConfig.title}
