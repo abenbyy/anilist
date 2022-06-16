@@ -326,7 +326,7 @@ export default function Home() {
               smallCols={2}
             >
               {data?.Page.media.map((anime, i) => (
-                <AnimeCard>
+                <AnimeCard key={i}>
                   <AnimeOverlay
                     show={editing}
                     onClick={() => handleSelect(i, anime.id)}
