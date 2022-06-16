@@ -63,7 +63,7 @@ export default function Collections() {
   return (
     <>
       <Head>
-        <title>Abenbyy's Anilist | Collections</title>
+        <title>Abenbyy&apos;s Anilist | Collections</title>
       </Head>
       <Modal show={showDialog} title="Delete Collection?">
         <div>

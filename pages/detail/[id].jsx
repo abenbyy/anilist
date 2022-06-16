@@ -158,6 +158,17 @@ export default function Detail() {
       });
       return;
     }
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    if (specialChars.test(collectionName)) {
+      setAlertConfig({
+        ...alertConfig,
+        show: true,
+        title: "Alert",
+        type: "warning",
+        message: `Collection name cannot contain special characters`,
+      });
+      return;
+    }
     if (
       action === "new" &&
       storage.map((col) => col.name).indexOf(collectionName) !== -1
@@ -200,7 +211,7 @@ export default function Detail() {
   return (
     <>
       <Head>
-        <title>Abenbyy's Anilist{data?.Media.title.romaji}</title>
+        <title>Abenbyy&apos;s Anilist | {data?.Media.title.romaji}</title>
       </Head>
       <Alert
         show={alertConfig.show}

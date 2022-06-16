@@ -71,6 +71,17 @@ export default function Home() {
       });
       return;
     }
+    const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+    if (specialChars.test(collectionName)) {
+      setAlertConfig({
+        ...alertConfig,
+        show: true,
+        title: "Alert",
+        type: "warning",
+        message: `Collection name cannot contain special characters`,
+      });
+      return;
+    }
     if (
       action === "new" &&
       storage.map((col) => col.name).indexOf(collectionName) !== -1
@@ -142,7 +153,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Abenbyy's Anilist | Home</title>
+        <title>Abenbyy&apos;s Anilist | Home</title>
       </Head>
       <Alert
         show={alertConfig.show}
