@@ -1,18 +1,25 @@
 import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { css } from "@emotion/css";
 import {
+  NavLogo,
   NavBar,
   Center,
   Container,
   NavItem,
   DotProgress,
+  Input,
   Button,
   Badge,
   Card,
   Modal,
   CollectionCard,
+  CollectionImage,
+  CollectionList,
+  ResponsiveGrid,
+  Alert,
+  LoadingScreen,
 } from "components";
 import Link from "next/link";
 import { ANIME_DETAIL } from "lib/queries/";
@@ -43,6 +50,9 @@ const StyledStats = styled.div({
   color: `${TEXT_ON_PRIMARY}`,
   fontSize: "16pt",
   marginTop: "5px",
+  "@media (max-width: 900px)": {
+    fontSize: "12pt",
+  },
 });
 
 const Label = styled.div({
@@ -51,15 +61,66 @@ const Label = styled.div({
   fontSize: "10pt",
   marginTop: "10px",
 });
+
 const Stats = styled.div({
   color: `${TEXT_ON_PRIMARY_ALT}`,
   fontSize: "11pt",
 });
 
+const BannerImage = styled.img({
+  width: "100%",
+  height: "250px",
+  objectFit: "cover",
+});
+
+const CoverImage = styled.img({
+  width: "100%",
+  height: "305px",
+  marginTop: "-85px",
+  boxShadow: `0 4px 8px 0 rgba(0,0,0,0.6)`,
+  "@media (max-width: 900px)": {
+    height: "auto",
+  },
+});
+
+const SectionTitle = styled.div({
+  color: `${TEXT_ON_PRIMARY}`,
+  fontSize: "16pt",
+  marginTop: "10px",
+});
+
+const CharacterImage = styled.img({
+  width: "70px",
+  height: "100px",
+});
+
+const CharacterName = styled.div({
+  height: "100%",
+  width: "70px",
+});
+
+const RecommendedImage = styled.img({
+  height: "250px",
+  maxWidth: "200px",
+});
+const RecommendedTitle = styled.div({
+  color: `${TEXT_ON_PRIMARY}`,
+  marginTop: "5px",
+  fontsize: "10pt",
+  maxWidth: "200px",
+});
+
 export default function Detail() {
   const router = useRouter();
   const { id } = router.query;
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({
+    show: false,
+    message: "",
+    title: "",
+    type: "success",
+  });
   const [newCollection, setNewCollection] = useState("");
   const { data, error, loading } = useQuery(ANIME_DETAIL, {
     variables: {
@@ -67,23 +128,49 @@ export default function Detail() {
     },
   });
 
-  const [storage, setStorage] = useStorage();
+  const [storage, setStorage, isInStorage] = useStorage();
   const handleNewCollection = () => {
     addToCollection(newCollection);
     setNewCollection("");
-    setShowModal(false);
   };
   const addToCollection = (collectionName) => {
-    setStorage(collectionName, {
-      id: data.Media.id,
-      title: data.Media.title.romaji,
-      image: data.Media.coverImage.large,
-    });
+    if (isInStorage(collectionName, data.Media.title.romaji)) {
+      setAlertConfig({
+        ...alertConfig,
+        show: true,
+        title: "Alert",
+        type: "warning",
+        message: "Anime is already in that collection",
+      });
+    } else {
+      setStorage(collectionName, {
+        id: data.Media.id,
+        title: data.Media.title.romaji,
+        image: data.Media.coverImage.large,
+      });
+      setAlertConfig({
+        ...alertConfig,
+        show: true,
+        title: "Success",
+        type: "success",
+        message: "Anime have been added to your collection",
+      });
+    }
+
+    setShowModal(false);
   };
-  console.log(data);
 
   return (
     <>
+      <Alert
+        show={alertConfig.show}
+        title={alertConfig.title}
+        type={alertConfig.type}
+        timeOut={5}
+        hideCallback={() => setAlertConfig({ ...alertConfig, show: false })}
+      >
+        {alertConfig.message}
+      </Alert>
       <Modal
         show={showModal}
         title={"Collections"}
@@ -93,7 +180,7 @@ export default function Detail() {
       >
         <div>Add to My Collection</div>
         {storage.map((str, i) => (
-          <CollectionCard onClick={() => addToCollection(str.name)}>
+          <CollectionCard key={i} onClick={() => addToCollection(str.name)}>
             <div
               className={css({
                 display: "flex",
@@ -101,22 +188,15 @@ export default function Detail() {
                 alignItems: "center",
               })}
             >
-              <img
-                className={css({
-                  width: "80px",
-                  height: "100px",
-                })}
-                src={str.list[0].image}
-                alt=""
-              />
+              <CollectionImage src={str.list[0].image} alt="" />
               <div
                 className={css({
                   marginLeft: "20px",
-                  fontsize: "16pt",
+                  fontSize: "16pt",
                 })}
               >
                 <div>{str.name}</div>
-                <div
+                <CollectionList
                   className={css({
                     fontSize: "10pt",
                     color: `${TEXT_ON_PRIMARY_ALT}`,
@@ -126,12 +206,12 @@ export default function Detail() {
                     if (i === 0) return anime.title;
                     else return `, ${anime.title}`;
                   })}
-                </div>
+                </CollectionList>
               </div>
             </div>
             <div
               className={css({
-                fontSize: "16pt",
+                marginLeft: "10px",
               })}
             >
               +
@@ -143,12 +223,7 @@ export default function Detail() {
           Create a New Collection
         </div>
         <div>
-          <input
-            className={css({
-              marginTop: "5px",
-              padding: "4px",
-              width: "100%",
-            })}
+          <Input
             placeholder="New collection name"
             onChange={(e) => setNewCollection(e.target.value)}
             type="text"
@@ -170,50 +245,31 @@ export default function Detail() {
             padding: "0 10px 0 10px",
           }}
         >
-          <img
-            style={{
-              width: "50px",
-            }}
-            src="https://anilist.co/img/icons/icon.svg"
-            alt=""
-          />
+          <NavLogo />
           <div
             style={{
               display: "flex",
             }}
           >
             <Link style={{ cursor: "pointer" }} href="/">
-              <NavItem
-                style={{
-                  borderBottom: "3px solid white",
-                  cursor: "pointer",
-                }}
-              >
-                <div style={{ fontSize: "14pt" }}>Anime</div>
-                <div style={{ fontSize: "8pt" }}>アニメ</div>
+              <NavItem active={true}>
+                <div className={css({ fontSize: "14pt" })}>Anime</div>
+                <div className={css({ fontSize: "8pt" })}>アニメ</div>
               </NavItem>
             </Link>
             <Link style={{ cursor: "pointer" }} href="/collections">
               <NavItem>
-                <div style={{ fontSize: "14pt" }}>Collections</div>
-                <div style={{ fontSize: "8pt" }}>コレクション</div>
+                <div className={css({ fontSize: "14pt" })}>Collections</div>
+                <div className={css({ fontSize: "8pt" })}>コレクション</div>
               </NavItem>
             </Link>
           </div>
         </Container>
       </NavBar>
       {loading && (
-        <div
-          style={{
-            width: "100%",
-            height: "calc(100vh - 20px)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <LoadingScreen>
           <DotProgress />
-        </div>
+        </LoadingScreen>
       )}
       {!loading && (
         <div
@@ -221,37 +277,31 @@ export default function Detail() {
             backgroundColor: `${BACKGROUND}`,
           })}
         >
-          <img
-            className={css({
-              width: "100%",
-              height: "250px",
-              objectFit: "cover",
-            })}
-            src={data.Media.bannerImage}
-            alt=""
-          />
+          <BannerImage src={data.Media.bannerImage} alt="" />
           <Center>
             <Container>
               <div
                 className={css({
                   display: "flex",
+                  "@media (max-width: 900px)": {
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  },
                 })}
               >
                 <div
                   className={css({
                     maxWidth: "215px",
+                    "@media (max-width: 900px)": {
+                      maxWidth: "100%",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    },
                   })}
                 >
-                  <img
-                    className={css({
-                      width: "215px",
-                      height: "305px",
-                      marginTop: "-85px",
-                      boxShadow: `0 4px 8px 0 rgba(0,0,0,0.6)`,
-                    })}
-                    src={data.Media.coverImage.large}
-                    alt=""
-                  />
+                  <CoverImage src={data.Media.coverImage.large} alt="" />
                   <Button
                     className={css({
                       width: "100%",
@@ -322,6 +372,10 @@ export default function Detail() {
                   className={css({
                     padding: "1.5rem",
                     width: "100%",
+                    "@media (max-width: 900px)": {
+                      marginTop: "20px",
+                      padding: "0",
+                    },
                   })}
                 >
                   <div
@@ -341,13 +395,12 @@ export default function Detail() {
                   >
                     {parse(data.Media.description)}
                   </div>
-                  <div
+                  <ResponsiveGrid
+                    cols={4}
+                    smallCols={2}
                     className={css({
                       marginTop: "10px",
                       width: "100%",
-                      display: "grid",
-                      gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-                      gap: "1rem",
                       padding: "10px 10px",
                       backgroundColor: `${PRIMARY}`,
                       borderRadius: "8px",
@@ -381,21 +434,13 @@ export default function Detail() {
                       <StyledLabel>Status</StyledLabel>
                       <StyledStats>{data.Media.status}</StyledStats>
                     </div>
-                  </div>
-                  <div
+                  </ResponsiveGrid>
+                  <SectionTitle>Characters and Voice Actors</SectionTitle>
+
+                  <ResponsiveGrid
+                    cols={2}
+                    smallCols={1}
                     className={css({
-                      color: `${TEXT_ON_PRIMARY}`,
-                      fontSize: "16pt",
-                      marginTop: "10px",
-                    })}
-                  >
-                    Characters and Voice Actors
-                  </div>
-                  <div
-                    className={css({
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-                      gap: "1rem",
                       marginTop: "10px",
                     })}
                   >
@@ -423,52 +468,41 @@ export default function Detail() {
                           <div
                             className={css({
                               display: "flex",
-                              width: "100%",
+                              width: "50%",
                               color: `${SECONDARY}`,
-
                               alignItems: "center",
                             })}
                           >
-                            <img
-                              className={css({
-                                width: "70px",
-                                height: "100px",
-                              })}
+                            <CharacterImage
                               src={char.node.image.medium}
                               alt=""
                             />
-                            <div
+                            <CharacterName
                               className={css({
-                                height: "100%",
-                                width: "70px",
                                 marginLeft: "10px",
                               })}
                             >
                               {char.node.name.full}
-                            </div>
+                            </CharacterName>
                           </div>
                           <div
                             className={css({
                               display: "flex",
+                              width: "50%",
                               color: `${SECONDARY}`,
                               alignItems: "center",
+                              justifyContent: "flex-end",
                             })}
                           >
-                            <div
+                            <CharacterName
                               className={css({
-                                height: "100%",
-                                width: "70px",
-                                marginRight: "10px",
                                 textAlign: "right",
+                                marginRight: "10px",
                               })}
                             >
                               {char.voiceActors[0].name.full}
-                            </div>
-                            <img
-                              className={css({
-                                width: "70px",
-                                height: "100px",
-                              })}
+                            </CharacterName>
+                            <CharacterImage
                               src={char.voiceActors[0].image.medium}
                               alt=""
                             />
@@ -476,49 +510,32 @@ export default function Detail() {
                         </div>
                       </Card>
                     ))}
-                  </div>
+                  </ResponsiveGrid>
                   {data.Media.trailer && (
                     <>
-                      <div
-                        className={css({
-                          color: `${TEXT_ON_PRIMARY}`,
-                          fontSize: "16pt",
-                          marginTop: "20px",
-                        })}
-                      >
-                        Trailer
-                      </div>
+                      <SectionTitle>Trailer</SectionTitle>
                       <iframe
                         className={css({ marginTop: "10px" })}
                         width="100%"
                         height="409"
                         src={`https://www.youtube.com/embed/${data.Media.trailer.id}`}
-                        title="MHR Sunbreak | Bow Solo 6:37 Astalos"
-                        frameborder="0"
+                        title=""
+                        frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
+                        allowFullScreen
                       ></iframe>
                     </>
                   )}
-                  <div
+                  <SectionTitle>Reccomendations</SectionTitle>
+                  <ResponsiveGrid
+                    cols={4}
+                    smallCols={2}
                     className={css({
-                      color: `${TEXT_ON_PRIMARY}`,
-                      fontSize: "16pt",
-                      marginTop: "20px",
-                    })}
-                  >
-                    Reccomendations
-                  </div>
-                  <div
-                    className={css({
-                      display: "grid",
                       marginTop: "10px",
-                      gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-                      gap: "1rem",
                     })}
                   >
                     {data.Media.recommendations.nodes.map((rec, i) => {
-                      if (i < 5)
+                      if (i < 4)
                         return (
                           <Link
                             key={i}
@@ -531,27 +548,18 @@ export default function Detail() {
                                 cursor: "pointer",
                               })}
                             >
-                              <img
-                                className={css({
-                                  height: "200px",
-                                })}
+                              <RecommendedImage
                                 src={rec.mediaRecommendation.coverImage.large}
                                 alt=""
                               />
-                              <div
-                                className={css({
-                                  color: `${TEXT_ON_PRIMARY}`,
-                                  marginTop: "5px",
-                                  fontsize: "10pt",
-                                })}
-                              >
+                              <RecommendedTitle>
                                 {rec.mediaRecommendation.title.romaji}
-                              </div>
+                              </RecommendedTitle>
                             </div>
                           </Link>
                         );
                     })}
-                  </div>
+                  </ResponsiveGrid>
                 </div>
               </div>
             </Container>

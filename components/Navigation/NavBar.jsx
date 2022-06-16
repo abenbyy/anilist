@@ -8,3 +8,15 @@ export const NavBar = styled.div({
   backgroundColor: `${TERTIARY}`,
   color: `${TEXT_ON_TERTIARY}`,
 });
+
+export const NavLogo = () => {
+  return (
+    <img
+      style={{
+        width: "50px",
+      }}
+      src="https://anilist.co/img/icons/icon.svg"
+      alt=""
+    />
+  );
+};

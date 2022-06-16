@@ -3,6 +3,16 @@ import { useEffect, useState } from "react";
 export default function useStorage() {
   const [state, setState] = useState([]);
 
+  const isInCollection = (collectionName, animeTitle) => {
+    let idx = state.map((col) => col.name).indexOf(collectionName);
+    let collection = state[idx];
+    let valIdx = collection.list
+      .map((anime) => anime.title)
+      .indexOf(animeTitle);
+
+    return valIdx !== -1;
+  };
+
   const add = (collectionName, value) => {
     let idx = state.map((col) => col.name).indexOf(collectionName);
     if (idx === -1) {
@@ -35,5 +45,5 @@ export default function useStorage() {
     else setState(JSON.parse(localStorage.getItem("collections")));
   }, []);
 
-  return [state, add, remove];
+  return [state, add, isInCollection, remove];
 }

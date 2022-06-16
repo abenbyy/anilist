@@ -52,12 +52,6 @@ export default function Pagination(props) {
         </>
       )}
 
-      {currentPage - 2 > 2 && (
-        <PaginationButton onClick={() => onPageChange(currentPage - 2)}>
-          {currentPage - 2}
-        </PaginationButton>
-      )}
-
       {currentPage - 1 > 2 && (
         <PaginationButton onClick={() => onPageChange(currentPage - 1)}>
           {currentPage - 1}
@@ -76,12 +70,6 @@ export default function Pagination(props) {
       {currentPage + 1 < totalPage - 2 && (
         <PaginationButton onClick={() => onPageChange(currentPage + 1)}>
           {currentPage + 1}
-        </PaginationButton>
-      )}
-
-      {currentPage + 2 < totalPage - 2 && (
-        <PaginationButton onClick={() => onPageChange(currentPage + 2)}>
-          {currentPage + 2}
         </PaginationButton>
       )}
 

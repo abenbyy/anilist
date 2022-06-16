@@ -1,23 +1,26 @@
 import { useQuery } from "@apollo/client";
 import { css } from "@emotion/css";
-import { DotProgress } from "components";
 import {
   NavBar,
   NavItem,
   Container,
   Center,
-  Card,
   Pagination,
-  Badge,
+  AnimeCard,
+  AnimeImage,
+  AnimeCardText,
+  Select,
+  LoadingScreen,
+  ResponsiveGrid,
+  NavLogo,
+  DotProgress,
 } from "components";
 import { ALL_ANIME_PAGINATE } from "lib/queries";
 import Link from "next/link";
 import { useState } from "react";
 import {
   BACKGROUND,
-  PRIMARY,
   SECONDARY,
-  SHADOW,
   TEXT_ON_PRIMARY,
   TEXT_ON_PRIMARY_ALT,
 } from "styles/global";
@@ -51,25 +54,14 @@ export default function Home() {
             padding: "0 10px 0 10px",
           }}
         >
-          <img
-            style={{
-              width: "50px",
-            }}
-            src="https://anilist.co/img/icons/icon.svg"
-            alt=""
-          />
+          <NavLogo />
           <div
             style={{
               display: "flex",
             }}
           >
             <Link style={{ cursor: "pointer" }} href="/">
-              <NavItem
-                style={{
-                  borderBottom: "3px solid white",
-                  cursor: "pointer",
-                }}
-              >
+              <NavItem active={true}>
                 <div style={{ fontSize: "14pt" }}>Anime</div>
                 <div style={{ fontSize: "8pt" }}>アニメ</div>
               </NavItem>
@@ -84,17 +76,9 @@ export default function Home() {
         </Container>
       </NavBar>
       {loading && (
-        <div
-          style={{
-            width: "100%",
-            height: "calc(100vh - 20px)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <LoadingScreen>
           <DotProgress />
-        </div>
+        </LoadingScreen>
       )}
       {!loading && (
         <Center
@@ -104,35 +88,11 @@ export default function Home() {
           }}
         >
           <Container>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-                gap: "2rem",
-              }}
-            >
+            <ResponsiveGrid cols={5} smallCols={2}>
               {data?.Page.media.map((anime, i) => (
                 <Link key={i} href={`/detail/${anime.id}`}>
-                  <Card
-                    style={{
-                      backgroundColor: PRIMARY,
-                      borderRadius: "10px",
-                      width: "100%",
-                      boxShadow: `0 4px 8px 0 ${SHADOW}`,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <img
-                      style={{
-                        width: "100%",
-                        maxHeight: "250px",
-                        height: "250px",
-                        objectFit: "fill",
-                        borderRadius: "10px 10px 0 0",
-                      }}
-                      src={anime.coverImage.large}
-                      alt=""
-                    />
+                  <AnimeCard>
+                    <AnimeImage src={anime.coverImage.large} />
                     <div
                       style={{
                         padding: "0.6rem 1rem 1rem 1rem",
@@ -141,78 +101,71 @@ export default function Home() {
                         justifyContent: "start",
                       }}
                     >
-                      <div
-                        style={{
-                          fontWeight: "600",
-                          fontSize: "12pt",
-                          color: `${TEXT_ON_PRIMARY}`,
-                        }}
-                      >
+                      <AnimeCardText size={"large"} color={TEXT_ON_PRIMARY}>
                         {anime.title.romaji}
-                      </div>
-                      <div
-                        style={{
-                          fontWeight: "400",
-                          fontSize: "10pt",
-                          color: `${SECONDARY}`,
-                        }}
-                      >
+                      </AnimeCardText>
+                      <AnimeCardText size={"medium"} color={SECONDARY}>
                         {anime.studios?.nodes[0]?.name}
-                      </div>
-                      <div
-                        style={{
-                          fontWeight: "400",
-                          fontSize: "10pt",
-                          color: `${TEXT_ON_PRIMARY_ALT}`,
-                        }}
+                      </AnimeCardText>
+                      <AnimeCardText
+                        size={"medium"}
+                        color={TEXT_ON_PRIMARY_ALT}
                       >
                         {anime.season} {anime.seasonYear} • {anime.episodes}{" "}
                         episode(s)
-                      </div>
+                      </AnimeCardText>
                     </div>
-                  </Card>
+                  </AnimeCard>
                 </Link>
               ))}
-            </div>
+            </ResponsiveGrid>
             <div
-              style={{
+              className={css({
                 width: "100%",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 marginTop: "20px",
-              }}
+                "@media (max-width: 900px)": {
+                  flexDirection: "column",
+                },
+              })}
             >
-              <div>
+              <div
+                className={css({
+                  "@media (max-width: 900px)": {
+                    marginBottom: "10px",
+                  },
+                })}
+              >
                 Showing {page * perPage} - {(page + 1) * perPage} of{" "}
                 {data.Page.pageInfo.total} items
               </div>
               <div
                 className={css({
                   display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  "@media (max-width: 900px)": {
+                    flexDirection: "column",
+                  },
                 })}
               >
-                <select
+                <Select
                   className={css({
-                    border: "none",
-                    boxShadow: `0 4px 8px 0 ${SHADOW}`,
-                    padding: "6px",
-                    borderRadius: "5px",
-                    color: `${SECONDARY}`,
-                    backgroundColor: `${PRIMARY}`,
+                    "@media (max-width: 900px)": {
+                      marginBottom: "10px",
+                    },
                   })}
-                  name=""
-                  id=""
                   onChange={(e) => {
                     setPerPage(e.target.value);
                     setLoaded(false);
                   }}
                 >
-                  <option value={10}>10 / page</option>
-                  <option value={20}>20 / page</option>
-                  <option value={50}>50 / page</option>
-                  <option value={100}>100 / page</option>
-                </select>
+                  {[10, 20, 50, 100].map((val, i) => (
+                    <option value={val}>{val} / page</option>
+                  ))}
+                </Select>
                 <Pagination
                   currentPage={page}
                   totalPage={maxPage}
