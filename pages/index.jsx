@@ -1,4 +1,5 @@
 import { useQuery } from "@apollo/client";
+import { css } from "@emotion/css";
 import { DotProgress } from "components";
 import {
   NavBar,
@@ -186,11 +187,38 @@ export default function Home() {
                 Showing {page * perPage} - {(page + 1) * perPage} of{" "}
                 {data.Page.pageInfo.total} items
               </div>
-              <Pagination
-                currentPage={page}
-                totalPage={maxPage}
-                onPageChange={(p) => setPage(p)}
-              />
+              <div
+                className={css({
+                  display: "flex",
+                })}
+              >
+                <select
+                  className={css({
+                    border: "none",
+                    boxShadow: `0 4px 8px 0 ${SHADOW}`,
+                    padding: "6px",
+                    borderRadius: "5px",
+                    color: `${SECONDARY}`,
+                    backgroundColor: `${PRIMARY}`,
+                  })}
+                  name=""
+                  id=""
+                  onChange={(e) => {
+                    setPerPage(e.target.value);
+                    setLoaded(false);
+                  }}
+                >
+                  <option value={10}>10 / page</option>
+                  <option value={20}>20 / page</option>
+                  <option value={50}>50 / page</option>
+                  <option value={100}>100 / page</option>
+                </select>
+                <Pagination
+                  currentPage={page}
+                  totalPage={maxPage}
+                  onPageChange={(p) => setPage(p)}
+                />
+              </div>
             </div>
           </Container>
         </Center>

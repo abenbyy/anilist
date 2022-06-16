@@ -11,6 +11,8 @@ import {
   Button,
   Badge,
   Card,
+  Modal,
+  CollectionCard,
 } from "components";
 import Link from "next/link";
 import { ANIME_DETAIL } from "lib/queries/";
@@ -57,14 +59,20 @@ const Stats = styled.div({
 export default function Detail() {
   const router = useRouter();
   const { id } = router.query;
-
+  const [showModal, setShowModal] = useState(true);
+  const [newCollection, setNewCollection] = useState("");
   const { data, error, loading } = useQuery(ANIME_DETAIL, {
     variables: {
       id: id,
     },
   });
 
-  const [storage, setStorage, removeStorage] = useStorage();
+  const [storage, setStorage] = useStorage();
+  const handleNewCollection = () => {
+    addToCollection(newCollection);
+    setNewCollection("");
+    setShowModal(false);
+  };
   const addToCollection = (collectionName) => {
     setStorage(collectionName, {
       id: data.Media.id,
@@ -76,6 +84,83 @@ export default function Detail() {
 
   return (
     <>
+      <Modal
+        show={showModal}
+        title={"Collections"}
+        handleHide={() => {
+          setShowModal(false);
+        }}
+      >
+        <div>Add to My Collection</div>
+        {storage.map((str, i) => (
+          <CollectionCard onClick={() => addToCollection(str.name)}>
+            <div
+              className={css({
+                display: "flex",
+                justifyContent: "start",
+                alignItems: "center",
+              })}
+            >
+              <img
+                className={css({
+                  width: "80px",
+                  height: "100px",
+                })}
+                src={str.list[0].image}
+                alt=""
+              />
+              <div
+                className={css({
+                  marginLeft: "20px",
+                  fontsize: "16pt",
+                })}
+              >
+                <div>{str.name}</div>
+                <div
+                  className={css({
+                    fontSize: "10pt",
+                    color: `${TEXT_ON_PRIMARY_ALT}`,
+                  })}
+                >
+                  {str.list.map((anime, i) => {
+                    if (i === 0) return anime.title;
+                    else return `, ${anime.title}`;
+                  })}
+                </div>
+              </div>
+            </div>
+            <div
+              className={css({
+                fontSize: "16pt",
+              })}
+            >
+              +
+            </div>
+          </CollectionCard>
+        ))}
+
+        <div className={css({ marginTop: "10px" })}>
+          Create a New Collection
+        </div>
+        <div>
+          <input
+            className={css({
+              marginTop: "5px",
+              padding: "4px",
+              width: "100%",
+            })}
+            placeholder="New collection name"
+            onChange={(e) => setNewCollection(e.target.value)}
+            type="text"
+          />
+          <Button
+            onClick={handleNewCollection}
+            className={css({ marginTop: "10px" })}
+          >
+            Create and Add
+          </Button>
+        </div>
+      </Modal>
       <NavBar>
         <Container
           style={{
@@ -172,7 +257,7 @@ export default function Detail() {
                       width: "100%",
                       marginTop: "15px",
                     })}
-                    onClick={() => addToCollection("test")}
+                    onClick={() => setShowModal(true)}
                   >
                     Add to Collections
                   </Button>
@@ -269,8 +354,8 @@ export default function Detail() {
                     })}
                   >
                     <div>
-                      <StyledLabel>Popularity</StyledLabel>
-                      <StyledStats>#{data.Media.popularity}</StyledStats>
+                      <StyledLabel>Rank</StyledLabel>
+                      <StyledStats>#{data.Media.rankings[0].rank}</StyledStats>
                     </div>
                     <div>
                       <StyledLabel>Rating</StyledLabel>
@@ -443,6 +528,7 @@ export default function Detail() {
                               className={css({
                                 display: "flex",
                                 flexDirection: "column",
+                                cursor: "pointer",
                               })}
                             >
                               <img
