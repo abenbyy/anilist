@@ -144,10 +144,33 @@ export default function Detail() {
   }, [loading, id, storage]);
 
   const handleNewCollection = () => {
-    addToCollection(newCollection);
+    addToCollection(newCollection, "new");
     setNewCollection("");
   };
-  const addToCollection = (collectionName) => {
+  const addToCollection = (collectionName, action) => {
+    if (collectionName === "") {
+      setAlertConfig({
+        ...alertConfig,
+        show: true,
+        title: "Alert",
+        type: "warning",
+        message: `Collection name cannot be empty`,
+      });
+      return;
+    }
+    if (
+      action === "new" &&
+      storage.map((col) => col.name).indexOf(collectionName) !== -1
+    ) {
+      setAlertConfig({
+        ...alertConfig,
+        show: true,
+        title: "Alert",
+        type: "warning",
+        message: `Collection "${collectionName}" already exist`,
+      });
+      return;
+    }
     if (isInStorage(collectionName, data.Media.title.romaji)) {
       setAlertConfig({
         ...alertConfig,
@@ -194,7 +217,10 @@ export default function Detail() {
       >
         <div>Add to My Collection</div>
         {storage.map((str, i) => (
-          <CollectionCard key={i} onClick={() => addToCollection(str.name)}>
+          <CollectionCard
+            key={i}
+            onClick={() => addToCollection(str.name, "existing")}
+          >
             <div
               className={css({
                 display: "flex",
@@ -246,6 +272,7 @@ export default function Detail() {
         <div>
           <Input
             placeholder="New collection name"
+            value={newCollection}
             onChange={(e) => setNewCollection(e.target.value)}
             type="text"
           />
@@ -330,7 +357,10 @@ export default function Detail() {
                       width: "100%",
                       marginTop: "15px",
                     })}
-                    onClick={() => setShowModal(true)}
+                    onClick={() => {
+                      setShowModal(true);
+                      setNewCollection("");
+                    }}
                   >
                     Add to Collections
                   </Button>
