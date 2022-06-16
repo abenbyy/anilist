@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { css } from "@emotion/css";
 import {
   NavBar,
@@ -26,6 +26,7 @@ import {
 import parse from "html-react-parser";
 import styled from "@emotion/styled";
 import { convertMonth } from "lib/utils";
+import useStorage from "lib/hooks/useStorage";
 
 const StyledLabel = styled.div({
   width: "fit-content",
@@ -63,8 +64,16 @@ export default function Detail() {
     },
   });
 
-  useEffect(() => {}, [id]);
+  const [storage, setStorage, removeStorage] = useStorage();
+  const addToCollection = (collectionName) => {
+    setStorage(collectionName, {
+      id: data.Media.id,
+      title: data.Media.title.romaji,
+      image: data.Media.coverImage.large,
+    });
+  };
   console.log(data);
+
   return (
     <>
       <NavBar>
@@ -143,7 +152,11 @@ export default function Detail() {
                   display: "flex",
                 })}
               >
-                <div>
+                <div
+                  className={css({
+                    maxWidth: "215px",
+                  })}
+                >
                   <img
                     className={css({
                       width: "215px",
@@ -151,7 +164,7 @@ export default function Detail() {
                       marginTop: "-85px",
                       boxShadow: `0 4px 8px 0 rgba(0,0,0,0.6)`,
                     })}
-                    src={data.Media.coverImage.extraLarge}
+                    src={data.Media.coverImage.large}
                     alt=""
                   />
                   <Button
@@ -159,6 +172,7 @@ export default function Detail() {
                       width: "100%",
                       marginTop: "15px",
                     })}
+                    onClick={() => addToCollection("test")}
                   >
                     Add to Collections
                   </Button>
@@ -190,6 +204,7 @@ export default function Detail() {
                     <Stats>{data.Media.title.native}</Stats>
                     <Label>English Title</Label>
                     <Stats>{data.Media.title.english}</Stats>
+
                     <Label>Aired at</Label>
                     <Stats>{`${convertMonth(data.Media.startDate.month)} ${
                       data.Media.startDate.day
@@ -209,11 +224,19 @@ export default function Detail() {
                         <div key={i}>{st.name}</div>
                       ))}
                     </Stats>
+                    <Label>Synonyms</Label>
+                    <Stats>
+                      {data.Media.synonyms.length <= 0 && <div>-</div>}
+                      {data.Media.synonyms.map((sy, i) => (
+                        <div key={i}>{sy}</div>
+                      ))}
+                    </Stats>
                   </div>
                 </div>
                 <div
                   className={css({
-                    padding: "1rem",
+                    padding: "1.5rem",
+                    width: "100%",
                   })}
                 >
                   <div
@@ -276,17 +299,26 @@ export default function Detail() {
                   </div>
                   <div
                     className={css({
+                      color: `${TEXT_ON_PRIMARY}`,
+                      fontSize: "16pt",
+                      marginTop: "10px",
+                    })}
+                  >
+                    Characters and Voice Actors
+                  </div>
+                  <div
+                    className={css({
                       display: "grid",
                       gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
                       gap: "1rem",
-                      marginTop: "20px",
+                      marginTop: "10px",
                     })}
                   >
                     {data.Media.characters.edges?.map((char, i) => (
                       <Card
                         style={{
                           backgroundColor: PRIMARY,
-                          borderRadius: "4px",
+                          borderRadius: "8px",
                           width: "100%",
                           height: "fit-content",
                           boxShadow: `0 4px 8px 0 ${SHADOW}`,
@@ -314,8 +346,8 @@ export default function Detail() {
                           >
                             <img
                               className={css({
-                                width: "80px",
-                                height: "120px",
+                                width: "70px",
+                                height: "100px",
                               })}
                               src={char.node.image.medium}
                               alt=""
@@ -323,6 +355,7 @@ export default function Detail() {
                             <div
                               className={css({
                                 height: "100%",
+                                width: "70px",
                                 marginLeft: "10px",
                               })}
                             >
@@ -339,6 +372,7 @@ export default function Detail() {
                             <div
                               className={css({
                                 height: "100%",
+                                width: "70px",
                                 marginRight: "10px",
                                 textAlign: "right",
                               })}
@@ -347,8 +381,8 @@ export default function Detail() {
                             </div>
                             <img
                               className={css({
-                                width: "80px",
-                                height: "120px",
+                                width: "70px",
+                                height: "100px",
                               })}
                               src={char.voiceActors[0].image.medium}
                               alt=""
@@ -357,6 +391,80 @@ export default function Detail() {
                         </div>
                       </Card>
                     ))}
+                  </div>
+                  {data.Media.trailer && (
+                    <>
+                      <div
+                        className={css({
+                          color: `${TEXT_ON_PRIMARY}`,
+                          fontSize: "16pt",
+                          marginTop: "20px",
+                        })}
+                      >
+                        Trailer
+                      </div>
+                      <iframe
+                        className={css({ marginTop: "10px" })}
+                        width="100%"
+                        height="409"
+                        src={`https://www.youtube.com/embed/${data.Media.trailer.id}`}
+                        title="MHR Sunbreak | Bow Solo 6:37 Astalos"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                      ></iframe>
+                    </>
+                  )}
+                  <div
+                    className={css({
+                      color: `${TEXT_ON_PRIMARY}`,
+                      fontSize: "16pt",
+                      marginTop: "20px",
+                    })}
+                  >
+                    Reccomendations
+                  </div>
+                  <div
+                    className={css({
+                      display: "grid",
+                      marginTop: "10px",
+                      gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
+                      gap: "1rem",
+                    })}
+                  >
+                    {data.Media.recommendations.nodes.map((rec, i) => {
+                      if (i < 5)
+                        return (
+                          <Link
+                            key={i}
+                            href={`/detail/${rec.mediaRecommendation.id}`}
+                          >
+                            <div
+                              className={css({
+                                display: "flex",
+                                flexDirection: "column",
+                              })}
+                            >
+                              <img
+                                className={css({
+                                  height: "200px",
+                                })}
+                                src={rec.mediaRecommendation.coverImage.large}
+                                alt=""
+                              />
+                              <div
+                                className={css({
+                                  color: `${TEXT_ON_PRIMARY}`,
+                                  marginTop: "5px",
+                                  fontsize: "10pt",
+                                })}
+                              >
+                                {rec.mediaRecommendation.title.romaji}
+                              </div>
+                            </div>
+                          </Link>
+                        );
+                    })}
                   </div>
                 </div>
               </div>

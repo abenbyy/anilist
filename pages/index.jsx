@@ -111,7 +111,7 @@ export default function Home() {
               }}
             >
               {data?.Page.media.map((anime, i) => (
-                <Link href={`/detail/${anime.id}`}>
+                <Link key={i} href={`/detail/${anime.id}`}>
                   <Card
                     style={{
                       backgroundColor: PRIMARY,
@@ -120,7 +120,6 @@ export default function Home() {
                       boxShadow: `0 4px 8px 0 ${SHADOW}`,
                       cursor: "pointer",
                     }}
-                    key={i}
                   >
                     <img
                       style={{
