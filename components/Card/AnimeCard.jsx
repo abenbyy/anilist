@@ -5,13 +5,13 @@ import { Card } from "./Card";
 export const AnimeCard = styled(Card)({
   backgroundColor: PRIMARY,
   borderRadius: "10px",
-  width: "100%",
+  width: "225px",
   boxShadow: `0 4px 8px 0 ${SHADOW}`,
   cursor: "pointer",
 });
 
 export const AnimeImage = styled.img({
-  width: "100%",
+  width: "225px",
   maxHeight: "250px",
   height: "250px",
   objectFit: "fill",

@@ -86,7 +86,9 @@ export default function Collections() {
             padding: "0 10px 0 10px",
           })}
         >
-          <NavLogo />
+          <Link style={{ cursor: "pointer" }} href="/">
+            <NavLogo />
+          </Link>
           <div
             style={{
               display: "flex",
@@ -124,7 +126,7 @@ export default function Collections() {
           </div>
           <ResponsiveGrid cols={2} smallCols={1}>
             {storage.map((str, i) => (
-              <CollectionCard key={i} onClick={() => {}}>
+              <CollectionCard key={i}>
                 <div
                   className={css({
                     display: "flex",
@@ -132,7 +134,7 @@ export default function Collections() {
                     alignItems: "center",
                   })}
                 >
-                  <Link href={`/collection/${str.name}`}>
+                  <Link href={`/collections/${str.name}`}>
                     <CollectionImage
                       src={
                         str.list.length > 0
@@ -159,9 +161,10 @@ export default function Collections() {
                           <Input
                             className={css({
                               fontSize: "16pt",
-                              marginBottom: "10px",
+                              marginBottom: "5px",
                               marginRight: "10px",
                             })}
+                            value={editCollection.new_name}
                             onChange={(e) =>
                               setEditCollection({
                                 ...editCollection,
@@ -179,6 +182,7 @@ export default function Collections() {
                           setEditCollection({
                             ...editCollection,
                             old_name: str.name,
+                            new_name: str.name,
                           })
                         }
                         className={css({

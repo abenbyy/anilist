@@ -38,14 +38,23 @@ export default function useStorage() {
   };
 
   const updateCollection = (oldName, newName) => {
+    console.log(oldName, newName);
     let idx = state.map((col) => col.name).indexOf(oldName);
     let newState = [...state];
+
     newState[idx].name = newName;
     setState(newState);
     localStorage.setItem("collections", JSON.stringify(newState));
   };
 
-  const remove = (collectionName, value) => {};
+  const remove = (collectionName, value) => {
+    let idx = state.map((col) => col.name).indexOf(collectionName);
+    let newState = [...state];
+    let aIdx = newState[idx].list.map((col) => col.id).indexOf(value);
+    newState[idx].list.splice(aIdx, 1);
+    setState(newState);
+    localStorage.setItem("collections", JSON.stringify(newState));
+  };
 
   const removeCollection = (collectionName) => {
     let idx = state.map((col) => col.name).indexOf(collectionName);

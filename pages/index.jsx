@@ -54,7 +54,9 @@ export default function Home() {
             padding: "0 10px 0 10px",
           })}
         >
-          <NavLogo />
+          <Link style={{ cursor: "pointer" }} href="/">
+            <NavLogo />
+          </Link>
           <div
             style={{
               display: "flex",
@@ -88,7 +90,22 @@ export default function Home() {
           })}
         >
           <Container>
-            <ResponsiveGrid cols={5} smallCols={2}>
+            <ResponsiveGrid
+              className={css({
+                justifyItems: "center",
+                "@media (max-width: 1380px)": {
+                  gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
+                },
+                "@media (max-width: 900px)": {
+                  gridTemplateColumns: `repeat(2, minmax(0, 1fr))`,
+                },
+                "@media (max-width: 500px)": {
+                  gridTemplateColumns: `repeat(1, minmax(0, 1fr))`,
+                },
+              })}
+              cols={5}
+              smallCols={2}
+            >
               {data?.Page.media.map((anime, i) => (
                 <Link key={i} href={`/detail/${anime.id}`}>
                   <AnimeCard>
@@ -163,7 +180,9 @@ export default function Home() {
                   }}
                 >
                   {[10, 20, 50, 100].map((val, i) => (
-                    <option value={val}>{val} / page</option>
+                    <option key={i} value={val}>
+                      {val} / page
+                    </option>
                   ))}
                 </Select>
                 <Pagination

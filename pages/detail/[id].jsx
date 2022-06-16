@@ -1,6 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { css } from "@emotion/css";
 import {
   NavLogo,
@@ -36,6 +36,7 @@ import parse from "html-react-parser";
 import styled from "@emotion/styled";
 import { convertMonth } from "lib/utils";
 import useStorage from "lib/hooks/useStorage";
+import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers";
 
 const StyledLabel = styled.div({
   width: "fit-content",
@@ -128,6 +129,20 @@ export default function Detail() {
   });
 
   const [storage, setStorage, isInStorage] = useStorage();
+  const [referCollection, setReferCollection] = useState([]);
+
+  useEffect(() => {
+    if (loading) return;
+    let arr = [];
+    storage.forEach((col) => {
+      col.list.forEach((anime) => {
+        if (anime.id === data.Media.id) arr.push(col);
+      });
+    });
+    console.log(arr);
+    setReferCollection(arr);
+  }, [loading, id, storage]);
+
   const handleNewCollection = () => {
     addToCollection(newCollection);
     setNewCollection("");
@@ -251,7 +266,9 @@ export default function Detail() {
             padding: "0 10px 0 10px",
           }}
         >
-          <NavLogo />
+          <Link style={{ cursor: "pointer" }} href="/">
+            <NavLogo />
+          </Link>
           <div
             style={{
               display: "flex",
@@ -532,7 +549,50 @@ export default function Detail() {
                       ></iframe>
                     </>
                   )}
-                  <SectionTitle>Reccomendations</SectionTitle>
+                  {referCollection.length > 0 && (
+                    <>
+                      <SectionTitle>In Collection</SectionTitle>
+                      <ResponsiveGrid cols={2} smallCols={1}>
+                        {referCollection.map((ref, id) => (
+                          <Link key={id} href={`/collections/${ref.name}`}>
+                            <CollectionCard>
+                              <div
+                                className={css({
+                                  display: "flex",
+                                  justifyContent: "start",
+                                  alignItems: "center",
+                                })}
+                              >
+                                <CollectionImage
+                                  src={
+                                    ref.list.length > 0
+                                      ? ref.list[0].image
+                                      : "https://anilist.co/img/icons/icon.svg"
+                                  }
+                                  alt=""
+                                />
+                                <div className={css({ marginLeft: "20px" })}>
+                                  <div>{ref.name}</div>
+                                  <CollectionList
+                                    className={css({
+                                      fontSize: "10pt",
+                                      color: `${TEXT_ON_PRIMARY_ALT}`,
+                                    })}
+                                  >
+                                    {ref.list.map((anime, i) => {
+                                      if (i === 0) return anime.title;
+                                      else return `, ${anime.title}`;
+                                    })}
+                                  </CollectionList>
+                                </div>
+                              </div>
+                            </CollectionCard>
+                          </Link>
+                        ))}
+                      </ResponsiveGrid>
+                    </>
+                  )}
+                  <SectionTitle>Recommendations</SectionTitle>
                   <ResponsiveGrid
                     cols={4}
                     smallCols={2}
