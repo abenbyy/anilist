@@ -4,8 +4,14 @@ export { default as Modal } from "./Layout/Modal";
 export { default as Alert } from "./Layout/Alert";
 export { LoadingScreen } from "./Layout/LoadingScreen";
 export { ResponsiveGrid } from "./Layout/ResponsiveGrid";
+export { default as FloatingActionButton } from "./Layout/FloatingActionButton";
 export { Card } from "./Card/Card";
-export { AnimeCard, AnimeImage, AnimeCardText } from "./Card/AnimeCard";
+export {
+  AnimeCard,
+  AnimeImage,
+  AnimeCardText,
+  AnimeOverlay,
+} from "./Card/AnimeCard";
 export {
   CollectionCard,
   CollectionImage,
@@ -15,6 +21,7 @@ export { default as Pagination } from "./Pagination/Pagination";
 export { NavBar, NavLogo } from "./Navigation/NavBar";
 export { NavItem } from "./Navigation/NavItem";
 export { default as XMark } from "./Icons/XMark";
+export { default as Save } from "./Icons/Save";
 export { default as Trash } from "./Icons/Trash";
 export { default as ArrowLeft } from "./Icons/ArrowLeft";
 export { default as ArrowRight } from "./Icons/ArrowRight";

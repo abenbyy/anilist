@@ -36,7 +36,6 @@ import parse from "html-react-parser";
 import styled from "@emotion/styled";
 import { convertMonth } from "lib/utils";
 import useStorage from "lib/hooks/useStorage";
-import { selectionSetMatchesResult } from "@apollo/client/cache/inmemory/helpers";
 
 const StyledLabel = styled.div({
   width: "fit-content",
