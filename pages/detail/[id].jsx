@@ -114,7 +114,6 @@ export default function Detail() {
   const router = useRouter();
   const { id } = router.query;
   const [showModal, setShowModal] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
   const [alertConfig, setAlertConfig] = useState({
     show: false,
     message: "",
@@ -188,7 +187,14 @@ export default function Detail() {
                 alignItems: "center",
               })}
             >
-              <CollectionImage src={str.list[0].image} alt="" />
+              <CollectionImage
+                src={
+                  str.list.length > 0
+                    ? str.list[0].image
+                    : "https://anilist.co/img/icons/icon.svg"
+                }
+                alt=""
+              />
               <div
                 className={css({
                   marginLeft: "20px",

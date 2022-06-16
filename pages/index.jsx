@@ -47,12 +47,12 @@ export default function Home() {
     <>
       <NavBar>
         <Container
-          style={{
+          className={css({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             padding: "0 10px 0 10px",
-          }}
+          })}
         >
           <NavLogo />
           <div
@@ -82,10 +82,10 @@ export default function Home() {
       )}
       {!loading && (
         <Center
-          style={{
+          className={css({
             backgroundColor: BACKGROUND,
             padding: "20px 0 20px 0",
-          }}
+          })}
         >
           <Container>
             <ResponsiveGrid cols={5} smallCols={2}>

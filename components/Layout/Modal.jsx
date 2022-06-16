@@ -9,7 +9,7 @@ export default function Modal(props) {
     <div
       className={css({
         position: "fixed",
-        zIndex: "999",
+        zIndex: "997",
         width: "100%",
         height: "100%",
         backgroundColor: "rgba(0,0,0,0.6)",
@@ -17,18 +17,18 @@ export default function Modal(props) {
         justifyContent: "center",
         alignItems: "center",
       })}
-      onClick={() => handleHide()}
     >
       <div
         className={css({
           borderRadius: "6px",
+          zIndex: "999",
           display: "flex",
           margin: "10px",
           flexDirection: "column",
           backgroundColor: `${PRIMARY}`,
           width: "fit-content",
           minWidth: `${minWidth}`,
-          minHeight: "240px",
+          height: "fit-content",
           padding: "0.8rem",
         })}
       >
