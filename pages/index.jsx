@@ -171,7 +171,8 @@ export default function Home() {
           setShowModal(false);
         }}
       >
-        <div>Add to My Collection</div>
+        {storage.length > 0 && <div>Add to My Collection</div>}
+        {storage.length === 0 && <div>You have no collections yet</div>}
         {storage.map((str, i) => (
           <CollectionCard
             key={i}

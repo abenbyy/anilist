@@ -128,6 +128,7 @@ export default function Collections() {
           >
             Your Collections
           </div>
+          {storage.length === 0 && <div>You have no collections yet</div>}
           <ResponsiveGrid cols={2} smallCols={1}>
             {storage.map((str, i) => (
               <CollectionCard key={i}>
